@@ -15,7 +15,7 @@ using Rng = Unity.Mathematics.Random;
     - Slice notation is very welcome! Writing the recursive logic
     for the multi-resolution Haar transform becomes very simple.
     This is how Rust does it, except that Run might have additional
-    tricks available?
+    tricks available? NativeArray implementing INativeSlice is great.
     - Going through floating-point paths to calculate logarithms that
     we know will range into the natural numbers is weird.
     - In Rust, instead of writing our Transform functions with type
@@ -63,7 +63,7 @@ public class HaarTransform : MonoBehaviour {
         _bufferB.Dispose();
     }
 
-    private static void Generate(NativeArray<float> input) {
+    private static void Generate(NativeSlice<float> input) {
         const double freq = 10.0;
         float phaseStep = (float)(math.PI * 2.0 / (double)(input.Length-1) * freq);
         for (int i = 0; i < input.Length; i++) {
@@ -71,7 +71,7 @@ public class HaarTransform : MonoBehaviour {
         }
     }
 
-    private static void Copy(NativeArray<float> a, NativeArray<float> b) {
+    private static void Copy(NativeSlice<float> a, NativeSlice<float> b) {
         for (int i = 0; i < a.Length; i++) {
             b[i] = a[i];
         }
