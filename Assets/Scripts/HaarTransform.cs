@@ -6,6 +6,10 @@ using Unity.Mathematics;
 using Rng = Unity.Mathematics.Random;
 
 /*
+    1D Multi-Resolution Haar Wavelet transform
+
+    Implementations guided by the book 'A Primer on Wavelets and Their Scientific Applications'
+
     Implementation Notes
 
     - Slice notation is very welcome! Writing the recursive logic
@@ -20,6 +24,11 @@ using Rng = Unity.Mathematics.Random;
         - Now, dividing by an irrational isn't great for fixed point, but TNum
         could totally be a ring of fixed point types. That sqrt(2) though...
 
+    Todo:
+
+    I currently get a 3.7 energy difference between input and output buffers.
+    Why is that? Seems too high to be attributable to floating point error?
+    Or maybe the energy really does diminish or grow through noisy iteration...
  */
 
 public class HaarTransform : MonoBehaviour {
