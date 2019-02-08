@@ -23,12 +23,20 @@ using Rng = Unity.Mathematics.Random;
     is any type that supports addition, subtraction, and division-by-sqrt(2)
         - Now, dividing by an irrational isn't great for fixed point, but TNum
         could totally be a ring of fixed point types. That sqrt(2) though...
+        - Try inner-product calculation instead
+        - Could try adding an extra dimension and working along the diagonal (wildberger)
 
     Todo:
 
-    I currently get a 3.7 energy difference between input and output buffers.
+    - I currently get a 3.7 energy difference between input and output buffers.
     Why is that? Seems too high to be attributable to floating point error?
     Or maybe the energy really does diminish or grow through noisy iteration...
+    Verify correctness with some hand-calculated examples
+
+    - Implement inner-product method of calculation (no sqrt(2) factor in the directly)
+        - Might be faster for getting specific depths, since no recursion
+
+    - Calculate cumulative energy profiles
  */
 
 public class HaarTransform : MonoBehaviour {
@@ -95,6 +103,8 @@ public class HaarTransform : MonoBehaviour {
             // left half of the input buffer
             int extents = a.Length / ((int)Mathf.Pow(2, i));
             Transform(a.Slice(0, extents), b.Slice(0, extents));
+
+            Debug.Log("Depth: " + i + ", Energy: " + SumOfSqrs(b));
 
             // swap the buffers
             var temp = a;
