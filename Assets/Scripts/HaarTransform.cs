@@ -4,6 +4,7 @@ using Unity.Jobs;
 using Unity.Collections;
 using Unity.Mathematics;
 using Rng = Unity.Mathematics.Random;
+using System.Text;
 
 /*
     1D Multi-Resolution Haar Wavelet transform
@@ -48,7 +49,7 @@ public class HaarTransform : MonoBehaviour {
     private const float sqrt2 = 1.41421356237f;
 
     private void Awake() {
-        const int signalLength = 64;
+        const int signalLength = 8;
         _input = new NativeArray<float>(signalLength, Allocator.Persistent);
         _bufferA = new NativeArray<float>(signalLength, Allocator.Persistent);
         _bufferB = new NativeArray<float>(signalLength, Allocator.Persistent);
@@ -72,11 +73,20 @@ public class HaarTransform : MonoBehaviour {
     }
 
     private static void Generate(NativeSlice<float> input) {
-        const double freq = 10.0;
-        float phaseStep = (float)(math.PI * 2.0 / (double)(input.Length-1) * freq);
-        for (int i = 0; i < input.Length; i++) {
-            input[i] = math.sin(phaseStep * i);
-        }
+        // const double freq = 10.0;
+        // float phaseStep = (float)(math.PI * 2.0 / (double)(input.Length-1) * freq);
+        // for (int i = 0; i < input.Length; i++) {
+        //     input[i] = math.sin(phaseStep * i);
+        // }
+
+        input[0] = 2;
+        input[1] = 2;
+        input[2] = 4;
+        input[3] = 6;
+        input[4] = 8;
+        input[5] = 8;
+        input[6] = 12;
+        input[7] = 10;
     }
 
     private static void Copy(NativeSlice<float> a, NativeSlice<float> b) {
@@ -102,9 +112,18 @@ public class HaarTransform : MonoBehaviour {
             // each level transforms the previous trend signal, which is the
             // left half of the input buffer
             int extents = a.Length / ((int)Mathf.Pow(2, i));
+            Debug.Log("Extents: " + extents);
             Transform(a.Slice(0, extents), b.Slice(0, extents));
+            Copy(a.Slice(extents), b.Slice(extents));
 
-            Debug.Log("Depth: " + i + ", Energy: " + SumOfSqrs(b));
+            var stringBuilder = new StringBuilder(1024);
+            stringBuilder.Append("level " + i + " [");
+            for (int j = 0; j < b.Length; j++) {
+                stringBuilder.Append(math.round((b[j] / sqrt2)) + ", ");
+
+            }
+            stringBuilder.Append("]");
+            Debug.Log(stringBuilder.ToString());
 
             // swap the buffers
             var temp = a;
@@ -139,6 +158,6 @@ public class HaarTransform : MonoBehaviour {
     }
 
     private static int MaxTransformDepth(int signalLength) {
-        return (int)math.round(math.log2(signalLength)) - 1;
+        return (int)math.round(math.log2(signalLength));
     }
 }
